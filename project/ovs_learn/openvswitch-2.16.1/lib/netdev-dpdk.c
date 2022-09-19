@@ -3320,7 +3320,7 @@ out:
 
     /* These are the available DPDK counters for packets not received due to
      * local resource constraints in DPDK and NIC respectively. */
-    stats->rx_dropped += rte_stats.rx_nombuf + rte_stats.imissed;
+    stats->rx_dropped += rte_stats.rx_nombuf + rte_stats.imissed; //rx_nombuf 一般无需统计
     stats->rx_missed_errors = rte_stats.imissed;
 
     ovs_mutex_unlock(&dev->mutex);

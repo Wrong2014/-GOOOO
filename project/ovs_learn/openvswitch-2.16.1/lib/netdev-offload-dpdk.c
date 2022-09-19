@@ -896,7 +896,7 @@ add_vport_match(struct flow_patterns *patterns,
     add_flow_tnl_items(patterns, physdev, tnl_pmd_items, tnl_pmd_items_cnt);
 
 out:
-    netdev_close(physdev);
+    netdev_close(physdev); //返回时需要先调用netdev_close,释放引用计数
     return ret;
 }
 
