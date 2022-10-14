@@ -961,6 +961,52 @@ ovs-appctl vlog/disable-rate-limit dpdk
 ```c++
 https://ww.sdnlab.com/community/article/dpdk/898
 
+ 1. 大页设置：
+         dpdk-hugepages.py -c
+         dpdk-hugepages.py -p 2M --setup 2G
+         dpdk-hugepages.py -s
+
+2. 绑定网卡：
+         未绑卡前，查看PCI设备：
+           modprobe uio；modprobe vfio-pci;   modprobe uio_pci_generic
+           dpdk-devbind.py -b vfio-pci 0000:3b:00.0
+     dpdk-devbind.py -b vfio-pci 0000:3b:00.1
+           绑卡之后，查看是否绑定成功：
+            解绑命令： dpdk-devbind -u 0000:3b:00.1
+
+3.  启动testpmd
+              ./dpdk-testpmd -l 1,2,3,4,5  -n 4 -- -i --nb-cores=4 --total-num-mbufs 49152         
+
+          -l                1 2 3 4 5 表示一共使用 5个核 一般第一个核是用来管理命令行的 不用来做转发 其他四个核用来转发    
+          -c              使用哪些核 ff 代表1111 1111 八个核     
+          -n              内存通道数
+          -q              每个cpu管理的收发队列
+          -p              使用的端口
+       --nb-cores=N    设置转发核心数   使用的核心数不得大于使用的端口数乘以每个端口的队列数
+       --rxq=N              将每个端口的 RX 队列数设置为 N
+       --rxd=N              将RX环中的描述符数量设置为N
+       --txq=N              将每个端口的 TX 队列数设置为 N
+       --txd=N              将TX环中的描述符数量设置为N
+       --burst=N          将每个突发的数据包数设置为 N。默认值为 32。
+      # 设置转发核心列表
+        set corelist 3,1
+        show config fwd
+      # 设置转发端口列表
+         set portlist 0,2,1,3
+         show config fwd
+      # 显示给定端口的 RX/TX 队列的信息
+         testpmd> show (rxq|txq) info (port_id) (queue_id)
+      # 显示给定端口或所有端口的信息
+        testpmd> show port (info|summary|stats|xstats|fdir|dcb_tc|cap) (port_id|all)
+        info：MAC 地址等通用端口信息。
+        summary：简要端口摘要，例如设备名称、驱动程序名称等。
+        统计：RX/TX 统计。
+        xstats：RX/TX 扩展网卡统计信息。
+        fdir：Flow Director 信息和统计信息。
+        dcb_tc：TC映射等DCB信息。
+     # 显示转发
+       show fwd stats all
+
 ```
 
 
